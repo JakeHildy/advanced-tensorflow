@@ -26,7 +26,7 @@ async function loadAndRunModel() {
     height: Math.round(boxSize.height),
   };
 
-  drawBox(newBox);
+  // drawBox(newBox);
 
   // 4. Crop the original image to the "padded" square surrounding the position found by coco model
   // let cropStartPoint = [15, 170, 0];
@@ -46,17 +46,16 @@ async function loadAndRunModel() {
   let arrayOutput = await tensorOutput.array();
 
   // 7. Draw the data points
-  arrayOutput[0][0].forEach((point, i) => {
+  arrayOutput[0][0].forEach((point) => {
     const dataPoint = {
       x: Math.round(point[1] * newBox.height + newBox.x),
-      y: Math.round(point[0] * newBox.height - newBox.y),
+      y: Math.round(point[0] * newBox.height + newBox.y),
       score: point[2],
     };
     drawPoint(dataPoint.x, dataPoint.y);
   });
 }
 
-let children = [];
 async function getImageBox(img, object = "person") {
   let imageTensor = tf.browser.fromPixels(img);
   const predictions = await coco.detect(imageTensor);
@@ -104,7 +103,6 @@ function drawBox(boxSize) {
     "px;";
 
   liveView.appendChild(highlighter);
-  // children.push(highlighter);
 }
 
 function drawPoint(x, y) {
