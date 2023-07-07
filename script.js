@@ -47,12 +47,12 @@ async function loadAndRunModel() {
 
   // 7. Draw the data points
   arrayOutput[0][0].forEach((point, i) => {
-    const noseData = {
-      x: Math.round(point[1] * 347 + newBox.x),
-      y: Math.round(point[0] * 347 - newBox.y),
+    const dataPoint = {
+      x: Math.round(point[1] * newBox.height + newBox.x),
+      y: Math.round(point[0] * newBox.height - newBox.y),
       score: point[2],
     };
-    drawPoint(noseData.x, noseData.y);
+    drawPoint(dataPoint.x, dataPoint.y);
   });
 }
 
