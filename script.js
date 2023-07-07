@@ -26,6 +26,8 @@ async function loadAndRunModel() {
     height: Math.round(boxSize.height),
   };
 
+  drawBox(newBox);
+
   // 4. Crop the original image to the "padded" square surrounding the position found by coco model
   // let cropStartPoint = [15, 170, 0];
   // let cropSize = [345, 345, 3];
@@ -42,9 +44,15 @@ async function loadAndRunModel() {
   // 6. Run Resized tensor through the movenet model to find person feature positions
   let tensorOutput = movenet.predict(tf.expandDims(resizedTensor));
   let arrayOutput = await tensorOutput.array();
-  console.log(arrayOutput);
+  // console.log(arrayOutput);
 
-  drawBox(boxSize);
+  // 7. Draw the nose
+  const noseData = {
+    x: Math.round(arrayOutput[0][0][0][1] * 347 + newBox.x),
+    y: Math.round(arrayOutput[0][0][0][0] * 347 - newBox.y),
+    score: arrayOutput[0][0][0][2],
+  };
+  drawPoint(noseData.x, noseData.y);
 }
 
 let children = [];
@@ -82,19 +90,26 @@ cocoSsd.load().then(function (loadedModel) {
 function drawBox(boxSize) {
   const highlighter = document.createElement("div");
   highlighter.setAttribute("class", "highlighter");
-  const paddingVal = (boxSize.height - boxSize.width) / 2;
+  // const paddingVal = (boxSize.height - boxSize.width) / 2;
   highlighter.style =
     "left: " +
-    (boxSize.x - paddingVal) +
+    boxSize.x +
     "px; top: " +
     boxSize.y +
     "px; width: " +
     boxSize.width +
     "px; height: " +
     boxSize.height +
-    "px; padding: " +
-    `0 ${paddingVal}px;`;
+    "px;";
 
   liveView.appendChild(highlighter);
   // children.push(highlighter);
+}
+
+function drawPoint(x, y) {
+  const point = document.createElement("div");
+  point.setAttribute("class", "point");
+
+  point.style = "left: " + x + "px; top: " + y + "px;";
+  liveView.appendChild(point);
 }
