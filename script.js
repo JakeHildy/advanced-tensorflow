@@ -44,15 +44,16 @@ async function loadAndRunModel() {
   // 6. Run Resized tensor through the movenet model to find person feature positions
   let tensorOutput = movenet.predict(tf.expandDims(resizedTensor));
   let arrayOutput = await tensorOutput.array();
-  // console.log(arrayOutput);
 
-  // 7. Draw the nose
-  const noseData = {
-    x: Math.round(arrayOutput[0][0][0][1] * 347 + newBox.x),
-    y: Math.round(arrayOutput[0][0][0][0] * 347 - newBox.y),
-    score: arrayOutput[0][0][0][2],
-  };
-  drawPoint(noseData.x, noseData.y);
+  // 7. Draw the data points
+  arrayOutput[0][0].forEach((point, i) => {
+    const noseData = {
+      x: Math.round(point[1] * 347 + newBox.x),
+      y: Math.round(point[0] * 347 - newBox.y),
+      score: point[2],
+    };
+    drawPoint(noseData.x, noseData.y);
+  });
 }
 
 let children = [];
